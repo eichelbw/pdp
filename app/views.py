@@ -1,15 +1,16 @@
 import json
 from random import random as r
 from flask import render_template
-# from flask.json import jsonify
-from app import app
+from app import app, models, db, db_session
 
 @app.route('/')
 def index():
     return render_template("index.html")
 
+# TODO change this to serve factor dimensions rather than random floats
 @app.route('/data')
 def data(ndata=300):
+    factors = db_session.query(models.Factor).all()
     return json.dumps([{
         '_id': i,
         'x': r(),
@@ -22,3 +23,10 @@ def data(ndata=300):
         'hp_y': r(),
         'hp_z': r()
         } for i in range(ndata)])
+
+@app.route('/test')
+def test():
+    factors = db_session.query(models.Factor).all()
+    return render_template('test.html',
+            factors=factors
+            )
