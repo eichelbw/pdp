@@ -79,18 +79,9 @@ $(document).ready(function(){
       unfiltered[i] = {
         x: +d.x,
         y: +d.y,
-        z: +d.z
+        z: +d.z,
+        c: +d.c
       };
-      lowPass[i] = {
-        x: +d.lp_x,
-        y: +d.lp_y,
-        z: +d.lp_z
-      };
-      highPass[i] = {
-        x: +d.hp_x,
-        y: +d.hp_y,
-        z: +d.hp_z
-      }
     })
 
     var xExent = d3.extent(unfiltered, function (d) {return d.x; }),
@@ -109,7 +100,7 @@ $(document).ready(function(){
       zMin: zExent[0]
     }
 
-    var colour = d3.scale.category20c();
+    var color = d3.scale.category20c();
 
     var xScale = d3.scale.linear()
       .domain(xExent)
@@ -166,49 +157,31 @@ $(document).ready(function(){
     line.type = THREE.Lines;
     scatterPlot.add(line);
 
-    var titleX = createText2D('-X');
-    titleX.position.x = xScale(vpts.xMin) - 12,
-    titleX.position.y = 5;
-    scatterPlot.add(titleX);
+    var posTitleX = createText2D('Factor1');
+    posTitleX.position.x = xScale(vpts.xMax) + 12;
+    posTitleX.position.y = 5;
+    scatterPlot.add(posTitleX);
 
-    var valueX = createText2D(format(xExent[0]));
-    valueX.position.x = xScale(vpts.xMin) - 12,
-    valueX.position.y = -5;
-    scatterPlot.add(valueX);
+    var negTitleX = createText2D('-Factor1');
+    negTitleX.position.x = xScale(vpts.xMin) - 12,
+    negTitleX.position.y = 5;
+    scatterPlot.add(negTitleX);
 
-    var titleX = createText2D('X');
-    titleX.position.x = xScale(vpts.xMax) + 12;
-    titleX.position.y = 5;
-    scatterPlot.add(titleX);
+    var posTitleY = createText2D('Factor2');
+    posTitleY.position.y = yScale(vpts.yMax) + 15;
+    scatterPlot.add(posTitleY);
 
-    var valueX = createText2D(format(xExent[1]));
-    valueX.position.x = xScale(vpts.xMax) + 12,
-    valueX.position.y = -5;
-    scatterPlot.add(valueX);
+    var negTitleY = createText2D('-Factor2');
+    negTitleY.position.y = yScale(vpts.yMin) - 5;
+    scatterPlot.add(negTitleY);
 
-    var titleY = createText2D('-Y');
-    titleY.position.y = yScale(vpts.yMin) - 5;
-    scatterPlot.add(titleY);
+    var posTitleZ = createText2D('Factor3');
+    posTitleZ.position.z = zScale(vpts.zMax) + 2;
+    scatterPlot.add(posTitleZ);
 
-    var valueY = createText2D(format(yExent[0]));
-    valueY.position.y = yScale(vpts.yMin) - 15,
-    scatterPlot.add(valueY);
-
-    var titleY = createText2D('Y');
-    titleY.position.y = yScale(vpts.yMax) + 15;
-    scatterPlot.add(titleY);
-
-    var valueY = createText2D(format(yExent[1]));
-    valueY.position.y = yScale(vpts.yMax) + 5,
-    scatterPlot.add(valueY);
-
-    var titleZ = createText2D('-Z ' + format(zExent[0]));
-    titleZ.position.z = zScale(vpts.zMin) + 2;
-    scatterPlot.add(titleZ);
-
-    var titleZ = createText2D('Z ' + format(zExent[1]));
-    titleZ.position.z = zScale(vpts.zMax) + 2;
-    scatterPlot.add(titleZ);
+    var negTitleZ = createText2D('-Factor3');
+    negTitleZ.position.z = zScale(vpts.zMin) + 2;
+    scatterPlot.add(negTitleZ);
 
     var mat = new THREE.ParticleBasicMaterial({
       vertexColors: true,
@@ -223,12 +196,10 @@ $(document).ready(function(){
       var z = zScale(unfiltered[i].z);
 
       pointGeo.vertices.push(new THREE.Vector3(x, y, z));
-      // console.log(pointGeo.vertices);
-      //pointGeo.vertices[i].angle = Math.atan2(z, x);
-      //pointGeo.vertices[i].radius = Math.sqrt(x * x + z * z);
-      //pointGeo.vertices[i].speed = (z / 100) * (x / 100);
       pointGeo.colors.push(new THREE.Color().setRGB(
-            hexToRgb(colour(i)).r / 255, hexToRgb(colour(i)).g / 255, hexToRgb(colour(i)).b / 255
+            hexToRgb(color(unfiltered[i].c)).r / 255,
+            hexToRgb(color(unfiltered[i].c)).g / 255,
+            hexToRgb(color(unfiltered[i].c)).b / 255
             ));
 
     }
@@ -272,8 +243,7 @@ $(document).ready(function(){
           var v = pointGeo.vertices;
           for (var i = 0; i < v.length; i++) {
             var u = v[i];
-            console.log(u)
-              u.angle += u.speed * 0.01;
+            u.angle += u.speed * 0.01;
             u.x = Math.cos(u.angle) * u.radius;
             u.z = Math.sin(u.angle) * u.radius;
           }
